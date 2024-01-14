@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Cryto Wallet</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<script
+			type = "text/javascript"
+			src="https://unpkg.com/bsv@1.5.3/bsv.min.js">
+		</script>
+		<script 
+			type="text/javascript" 
+			src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js">
+		</script>
+		<script 
+			src="https://unpkg.com/axios/dist/axios.min.js">
+		</script>
+		<link rel="stylesheet" href="Q1_2_css.css">		
+	</head>
+	<body>
+		<h1>Your Wallet</h1>
+		<div class="center">
+			<h4>Public Key: </h4>
+			<p>
+				<span id="public_key"></span><br/>
+			</p>
+		</div>
+		<div id="block">
+		</div>
+		<div class="center">
+			<h4>Key Address: </h4>
+			<p>
+				<span id="key_address"></span><br/>
+			</p>
+		</div>
+		<div id="block">
+		</div>
+		<div class="center">
+			<h4>QRCode: </h4>
+			<p>
+				<span style="display: flex; justify-content: center;" id="qrcode"></span><br/>
+			</p>
+		</div>
+		<div id="block">
+		</div>
+		<div class="center">
+			<h4>Live Data:</h4>
+			<p>
+				Price: <span id="rate"></span><br/>
+			</p>
+			<p>
+				Currency: <span id="currency"></span><br/>
+			</p>
+			<form action="https://whatsonchain.com/">
+				<button type="submit">
+					WhatsOnChain
+				</button>
+			</form>
+			<div id = block>
+			</div>
+			<form action="https://api.whatsonchain.com/v1/bsv/main/exchangerate">
+				<button type="submit">
+					API
+				</button>
+			</form>
+			<div id="block">
+			</div>
+		</div>
+		<script>
+			var prikey = document.querySelector("#private_key");
+			var privateKey = bsv.PrivateKey.fromRandom();
+			console.log("Private Key:" + privateKey.toString());
+			
+			var pubkey = document.querySelector("#public_key");
+			var publicKey = bsv.PublicKey.fromPrivateKey(privateKey);
+			pubkey.innerHTML = publicKey.toString();
+			
+			var keyadd = document.querySelector("#key_address");
+			var address = bsv.Address.fromPublicKey(publicKey);
+			keyadd.innerHTML = address.toString();
+			
+			var addressCode = 'bitcoinsv:' + address;
+			console.log(addressCode)
+			new QRCode(document.getElementById("qrcode"), addressCode);
+			
+			var config = {
+				method: 'get',
+				url: "https://api.whatsonchain.com/v1/bsv/main/exchangerate",
+			};
+			axios(config).then(
+				(response) => {
+					let data = JSON.stringify(response.data);					
+					localStorage.setItem("data", data);
+
+					let text = localStorage.getItem("data");
+					let obj = JSON.parse(text);
+					
+					let api_live1 = document.getElementById("rate");
+					api_live1.innerHTML = (obj.rate);
+					let api_live2 = document.getElementById("currency");
+					api_live2.innerHTML = (obj.currency);
+				}
+			)
+		</script>
+	</body>
+</html>
